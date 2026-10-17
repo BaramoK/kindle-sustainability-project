@@ -290,6 +290,25 @@ Once inside KOReader, you never need to connect a physical micro-USB cable again
 
 ---
 
+## 📱 Bonus App: Kindle Drop — Wireless Web GUI (Mac & Phone)
+
+Included in this repository is **Kindle Drop**, a lightweight, responsive web app that allows you to drag-and-drop books from your **Mac** or upload directly from your **iPhone / Android phone**:
+
+### Features
+* 📱 **Mobile-Friendly Phone Uploader:** Generates a local QR code on your Mac screen—scan with your phone camera to instantly open the uploader in your mobile browser.
+* 🔍 **Auto-Detection:** Scans your local home network to discover your Kindle's IP automatically.
+* 📚 **Drag-and-Drop Dropzone:** Multi-file upload with live progress bars directly to `/mnt/us/books/`.
+* 📖 **Remote Library Explorer:** View, search, and delete books stored on your Kindle without touching the device.
+
+### How to Run
+```bash
+./kindle_drop/run.sh
+```
+* **On Mac:** Automatically opens `http://localhost:5050` in your browser.
+* **On Phone:** Connect to the same Wi-Fi and scan the on-screen QR code (or visit `http://<YOUR_MAC_IP>:5050`).
+
+---
+
 ## Troubleshooting Quick-Reference
 
 | Issue | Cause | Solution |
@@ -300,7 +319,9 @@ Once inside KOReader, you never need to connect a physical micro-USB cable again
 | **Demo lockout screen** | Demo mode missing content | Perform secret gesture: 2-finger tap bottom-right ➔ swipe left. |
 | **"Application error" on exit** | Demo framework glitch | Tap Close and look for Store icon; or hard reboot (15s) and re-open `;demo`. |
 | **Kindle restarts on KOReader exit** | Normal "No-Framework" behavior | Expected: restarting Amazon Java GUI (`lab126_gui`) after exit. |
-| **Wireless book sync** | Avoids fragile micro-USB port wear | Turn on SSH server in KOReader; connect via macOS Finder (`Cmd+K`). |
+| **USB mode not popping up in KOReader** | Amazon daemons suspended | Expected in No-Framework mode: use Kindle Drop / Wi-Fi SFTP, or exit KOReader. |
+| **KOReader crashes back to home menu** | FAT32 corruption (`FSCK0000.REN` files) | Caused by pulling cable or dead battery. Reinstall clean KOReader files while preserving `settings/`. |
+| **Wireless book sync** | Avoids fragile micro-USB port wear | Turn on SSH server in KOReader; use Kindle Drop GUI or macOS Finder (`Cmd+K`). |
 
 ---
 

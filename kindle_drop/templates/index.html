@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kindle Drop — Wireless Book Uploader</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0ea5e9;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --accent: #6366f1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 4px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      font-size: 28px;
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .tagline {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .badge-offline { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-online { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-loading { background: rgba(245, 158, 11, 0.15); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-offline { background: var(--danger); }
+    .dot-online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+    .dot-loading { background: var(--warning); animation: pulse 1s infinite alternate; }
+
+    @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Connection Card */
+    .connection-grid {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .connection-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    input[type="text"], input[type="search"] {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus, input[type="search"]:focus {
+      border-color: var(--primary);
+    }
+
+    button {
+      background: var(--primary);
+      color: #0f172a;
+      font-weight: 600;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    button:hover { background: var(--primary-hover); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: #334155;
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: #475569; }
+
+    .device-info-bar {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Phone QR Card */
+    .phone-card {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(56, 189, 248, 0.1));
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    @media (max-width: 600px) {
+      .phone-card {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    .qr-frame {
+      background: white;
+      padding: 6px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+
+    .qr-frame img {
+      width: 100px;
+      height: 100px;
+      display: block;
+    }
+
+    .phone-text h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .phone-text p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .url-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--primary);
+    }
+
+    /* Drop Zone */
+    .dropzone {
+      border: 2px dashed #475569;
+      border-radius: 16px;
+      padding: 36px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    .dropzone.dragover {
+      border-color: var(--primary);
+      background: rgba(56, 189, 248, 0.08);
+      transform: scale(0.99);
+    }
+
+    .drop-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .drop-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .drop-subtext {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Progress bar */
+    .progress-box {
+      margin-top: 14px;
+      display: none;
+    }
+
+    .progress-bar-bg {
+      background: #334155;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      width: 0%;
+      transition: width 0.2s;
+    }
+
+    /* Books Explorer */
+    .books-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+
+    .book-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .book-list::-webkit-scrollbar { width: 6px; }
+    .book-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+    .book-item {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .book-item:hover { border-color: #475569; }
+
+    .book-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .format-pill {
+      font-size: 10px;
+      font-weight: 800;
+      background: #334155;
+      color: var(--primary);
+      padding: 4px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .book-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 440px;
+    }
+
+    .book-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .book-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: 1px solid #334155;
+      color: var(--text-muted);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .btn-icon:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 999;
+    }
+
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="logo-icon">📖</div>
+      <div>
+        <h1>Kindle Drop</h1>
+        <div class="tagline">Wireless Book Uploader for KOReader</div>
+      </div>
+    </div>
+    <div id="statusBadge" class="badge badge-offline">
+      <span class="dot dot-offline"></span>
+      <span id="statusText">Checking...</span>
+    </div>
+  </header>
+
+  <!-- Kindle Connection Card -->
+  <div class="card">
+    <div class="card-title">
+      <span>Kindle Connection</span>
+      <span id="scanStatus" style="font-size: 12px; text-transform: none; color: var(--text-muted);"></span>
+    </div>
+    <div class="connection-grid">
+      <input type="text" id="kindleIpInput" placeholder="Kindle IP (e.g. 192.168.1.50)" value="{{ config.kindle_ip }}">
+      <button id="connectBtn" onclick="testConnection()">Connect</button>
+      <button class="btn-secondary" id="scanBtn" onclick="scanNetwork()">🔍 Auto-Detect</button>
+    </div>
+    <div class="device-info-bar">
+      <span id="storageInfo">Storage: Checking...</span>
+      <span id="booksCount">Books on device: --</span>
+    </div>
+  </div>
+
+  <!-- Phone Upload QR Card -->
+  <div class="card phone-card">
+    <div class="qr-frame">
+      <img src="/api/qr" alt="QR Code for Mobile">
+    </div>
+    <div class="phone-text">
+      <h3>📱 Upload Directly From Your Phone</h3>
+      <p>Scan with your iPhone or Android camera to open this uploader on your mobile browser. Send downloaded EPUBs to your Kindle instantly over Wi-Fi.</p>
+      <div class="url-chip">
+        <span>{{ phone_url }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Card -->
+  <div class="card">
+    <div class="card-title">Send Books to Kindle</div>
+    <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+      <span class="drop-icon">📚</span>
+      <div class="drop-text">Drag & drop books here, or click to browse</div>
+      <div class="drop-subtext">Supports EPUB, PDF, MOBI, CBZ, CBR, AZW3, TXT</div>
+      <input type="file" id="fileInput" multiple accept=".epub,.pdf,.mobi,.azw3,.cbz,.cbr,.txt" style="display: none;" onchange="handleFileSelect(event)">
+    </div>
+    <div class="progress-box" id="progressBox">
+      <div style="display: flex; justify-content: space-between; font-size: 13px;">
+        <span id="uploadStatusText">Uploading to Kindle...</span>
+        <span id="uploadPercent">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-fill" id="progressBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Books Explorer -->
+  <div class="card">
+    <div class="books-header">
+      <div class="card-title" style="margin-bottom: 0;">Kindle Library</div>
+      <button class="btn-secondary" onclick="loadBooks()" style="padding: 6px 12px; font-size: 12px;">🔄 Refresh</button>
+    </div>
+    <input type="search" id="searchInput" placeholder="Filter books on Kindle..." oninput="filterBooks()" style="margin-bottom: 12px;">
+    <div class="book-list" id="bookList">
+      <div class="empty-state">Connect to your Kindle to view books.</div>
+    </div>
+  </div>
+</div>
+
+<div id="toast">✅ Message</div>
+
+<script>
+  let allBooks = [];
+
+  function showToast(msg, isError = false) {
+    const toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.style.borderColor = isError ? "var(--danger)" : "var(--card-border)";
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3500);
+  }
+
+  async function testConnection(customIp = null) {
+    const ip = customIp || document.getElementById("kindleIpInput").value.trim();
+    if (!ip) {
+      showToast("Please enter your Kindle IP address", true);
+      return;
+    }
+
+    const badge = document.getElementById("statusBadge");
+    const statusText = document.getElementById("statusText");
+    badge.className = "badge badge-loading";
+    badge.querySelector(".dot").className = "dot dot-loading";
+    statusText.textContent = "Connecting...";
+
+    try {
+      const res = await fetch(`/api/status?ip=${encodeURIComponent(ip)}`);
+      const data = await res.json();
+      if (data.connected) {
+        badge.className = "badge badge-online";
+        badge.querySelector(".dot").className = "dot dot-online";
+        statusText.textContent = "Kindle Online";
+        document.getElementById("storageInfo").textContent = `Storage: ${data.storage || 'Available'}`;
+        document.getElementById("booksCount").textContent = `Books on device: ${data.books_count}`;
+        document.getElementById("kindleIpInput").value = data.ip;
+        showToast("Connected to Kindle!");
+        loadBooks();
+      } else {
+        badge.className = "badge badge-offline";
+        badge.querySelector(".dot").className = "dot dot-offline";
+        statusText.textContent = "Offline";
+        showToast("Could not reach Kindle. Check Wi-Fi & SSH server.", true);
+      }
+    } catch (err) {
+      badge.className = "badge badge-offline";
+      badge.querySelector(".dot").className = "dot dot-offline";
+      statusText.textContent = "Error";
+      showToast("Connection failed", true);
+    }
+  }
+
+  async function scanNetwork() {
+    const scanStatus = document.getElementById("scanStatus");
+    const scanBtn = document.getElementById("scanBtn");
+    scanBtn.disabled = true;
+    scanStatus.textContent = "Scanning local network on port 2222...";
+
+    try {
+      const res = await fetch("/api/scan", { method: "POST" });
+      const data = await res.json();
+      if (data.found && data.found.length > 0) {
+        const foundIp = data.found[0];
+        document.getElementById("kindleIpInput").value = foundIp;
+        scanStatus.textContent = `Found Kindle at ${foundIp}!`;
+        showToast(`Found Kindle at ${foundIp}`);
+        testConnection(foundIp);
+      } else {
+        scanStatus.textContent = "No Kindle found. Enter IP manually from KOReader.";
+        showToast("No Kindle detected on port 2222", true);
+      }
+    } catch (err) {
+      scanStatus.textContent = "Scan failed.";
+    } finally {
+      scanBtn.disabled = false;
+    }
+  }
+
+  async function loadBooks() {
+    const bookList = document.getElementById("bookList");
+    bookList.innerHTML = `<div class="empty-state">Loading books from Kindle...</div>`;
+
+    try {
+      const res = await fetch("/api/books");
+      const data = await res.json();
+      if (data.status === "ok") {
+        allBooks = data.books;
+        renderBooks(allBooks);
+        document.getElementById("booksCount").textContent = `Books on device: ${allBooks.length}`;
+      } else {
+        bookList.innerHTML = `<div class="empty-state">Could not fetch books: ${data.message}</div>`;
+      }
+    } catch (err) {
+      bookList.innerHTML = `<div class="empty-state">Connect to Kindle to see library.</div>`;
+    }
+  }
+
+  function renderBooks(books) {
+    const bookList = document.getElementById("bookList");
+    if (!books || books.length === 0) {
+      bookList.innerHTML = `<div class="empty-state">No books in /books folder yet. Drop some above!</div>`;
+      return;
+    }
+
+    bookList.innerHTML = books.map(book => `
+      <div class="book-item">
+        <div class="book-info">
+          <span class="format-pill">${book.format}</span>
+          <div>
+            <div class="book-title" title="${book.filename}">${book.filename}</div>
+            <div class="book-meta">${book.size_fmt}</div>
+          </div>
+        </div>
+        <div class="book-actions">
+          <button class="btn-icon" onclick="deleteBook('${encodeURIComponent(book.filename)}')">🗑️</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function filterBooks() {
+    const query = document.getElementById("searchInput").value.toLowerCase();
+    const filtered = allBooks.filter(b => b.filename.toLowerCase().includes(query));
+    renderBooks(filtered);
+  }
+
+  async function deleteBook(encodedFilename) {
+    const filename = decodeURIComponent(encodedFilename);
+    if (!confirm(`Delete "${filename}" from Kindle?`)) return;
+
+    try {
+      const res = await fetch("/api/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename })
+      });
+      const data = await res.json();
+      if (data.status === "ok") {
+        showToast(`Deleted ${filename}`);
+        loadBooks();
+      } else {
+        showToast(`Failed: ${data.message}`, true);
+      }
+    } catch (err) {
+      showToast("Delete failed", true);
+    }
+  }
+
+  function handleFileSelect(event) {
+    const files = event.target.files;
+    if (files.length > 0) uploadFiles(files);
+  }
+
+  async function uploadFiles(files) {
+    const formData = new FormData();
+    for (let f of files) formData.append("files", f);
+
+    const progressBox = document.getElementById("progressBox");
+    const progressBar = document.getElementById("progressBar");
+    const uploadPercent = document.getElementById("uploadPercent");
+    const uploadStatusText = document.getElementById("uploadStatusText");
+
+    progressBox.style.display = "block";
+    progressBar.style.width = "0%";
+    uploadPercent.textContent = "0%";
+    uploadStatusText.textContent = `Uploading ${files.length} book(s) to Kindle...`;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/upload");
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        progressBar.style.width = percent + "%";
+        uploadPercent.textContent = percent + "%";
+      }
+    };
+
+    xhr.onload = () => {
+      progressBox.style.display = "none";
+      if (xhr.status === 200) {
+        const data = JSON.parse(xhr.responseText);
+        if (data.status === "ok") {
+          showToast(`Successfully transferred ${data.transferred.length} book(s)!`);
+          loadBooks();
+        } else {
+          showToast(`Transfer error: ${data.errors.join(", ")}`, true);
+        }
+      } else {
+        showToast("Upload failed. Check Kindle connection.", true);
+      }
+      document.getElementById("fileInput").value = "";
+    };
+
+    xhr.onerror = () => {
+      progressBox.style.display = "none";
+      showToast("Upload failed", true);
+      document.getElementById("fileInput").value = "";
+    };
+
+    xhr.send(formData);
+  }
+
+  // Drag & drop handlers
+  const dropzone = document.getElementById("dropzone");
+  ['dragenter', 'dragover'].forEach(name => {
+    dropzone.addEventListener(name, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); }, false);
+  });
+  ['dragleave', 'drop'].forEach(name => {
+    dropzone.addEventListener(name, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); }, false);
+  });
+  dropzone.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files.length > 0) uploadFiles(files);
+  });
+
+  // On page load
+  window.addEventListener("DOMContentLoaded", () => {
+    const ip = document.getElementById("kindleIpInput").value.trim();
+    if (ip) {
+      testConnection(ip);
+    } else {
+      document.getElementById("statusBadge").className = "badge badge-offline";
+      document.getElementById("statusText").textContent = "Enter Kindle IP";
+    }
+  });
+</script>
+
+</body>
+</html>

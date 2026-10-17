@@ -7,3 +7,5 @@ kindle_payload/
 watchthis-release/
 watchthis-jailbreak-r03.zip
 .venv/
+app_env/
+kindle_drop/config.json
