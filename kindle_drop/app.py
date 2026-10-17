@@ -184,10 +184,30 @@ def scan_network():
     target_port = cfg.get("port", 2222)
 
     found_ips = []
+    amazon_arp_ips = []
+
+    # 1. Check local ARP cache for Amazon MAC OUIs
+    amazon_mac_prefixes = (
+        "0:bb:3a", "00:bb:3a", "f0:27:2d", "fc:a6:67", "44:65:0d", "68:37:e9",
+        "68:54:fd", "74:c2:46", "78:e1:03", "84:d6:d0", "ac:63:be", "b0:79:94",
+        "cc:9e:a2", "d0:d2:b0", "fc:65:de", "38:f7:3d", "50:f5:da"
+    )
+    try:
+        import subprocess
+        arp_output = subprocess.check_output(["arp", "-a"], text=True)
+        for line in arp_output.split("\n"):
+            line_lower = line.lower()
+            if any(p in line_lower for p in amazon_mac_prefixes):
+                # Extract IP between ( )
+                if "(" in line and ")" in line:
+                    ip_candidate = line.split("(")[1].split(")")[0]
+                    amazon_arp_ips.append(ip_candidate)
+    except Exception:
+        pass
 
     def probe(host):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(0.4)
+        s.settimeout(1.2)
         try:
             s.connect((host, target_port))
             s.close()
@@ -195,15 +215,24 @@ def scan_network():
         except Exception:
             return None
 
-    # Scan 1..254 concurrently
-    with ThreadPoolExecutor(max_workers=60) as executor:
-        hosts = [f"{subnet_prefix}.{i}" for i in range(1, 255)]
-        results = executor.map(probe, hosts)
-        for res in results:
-            if res:
-                found_ips.append(res)
+    # Probe Amazon ARP candidates first with priority
+    for host in amazon_arp_ips:
+        if probe(host):
+            found_ips.append(host)
 
-    return jsonify({"found": found_ips})
+    # If not found via ARP, probe full subnet concurrently
+    if not found_ips:
+        with ThreadPoolExecutor(max_workers=80) as executor:
+            hosts = [f"{subnet_prefix}.{i}" for i in range(1, 255)]
+            results = executor.map(probe, hosts)
+            for res in results:
+                if res and res not in found_ips:
+                    found_ips.append(res)
+
+    return jsonify({
+        "found": found_ips,
+        "amazon_candidates": amazon_arp_ips
+    })
 
 @app.route("/api/books")
 def list_books():

@@ -556,7 +556,7 @@
     const scanStatus = document.getElementById("scanStatus");
     const scanBtn = document.getElementById("scanBtn");
     scanBtn.disabled = true;
-    scanStatus.textContent = "Scanning local network on port 2222...";
+    scanStatus.textContent = "Scanning network for Kindle...";
 
     try {
       const res = await fetch("/api/scan", { method: "POST" });
@@ -564,12 +564,17 @@
       if (data.found && data.found.length > 0) {
         const foundIp = data.found[0];
         document.getElementById("kindleIpInput").value = foundIp;
-        scanStatus.textContent = `Found Kindle at ${foundIp}!`;
-        showToast(`Found Kindle at ${foundIp}`);
+        scanStatus.textContent = `Found active Kindle at ${foundIp}!`;
+        showToast(`Found active Kindle at ${foundIp}`);
         testConnection(foundIp);
+      } else if (data.amazon_candidates && data.amazon_candidates.length > 0) {
+        const candidateIp = data.amazon_candidates[0];
+        document.getElementById("kindleIpInput").value = candidateIp;
+        scanStatus.textContent = `Kindle found at ${candidateIp} (turn SSH Server ON in KOReader!)`;
+        showToast(`Kindle found at ${candidateIp}. Turn SSH Server ON in KOReader!`, true);
       } else {
-        scanStatus.textContent = "No Kindle found. Enter IP manually from KOReader.";
-        showToast("No Kindle detected on port 2222", true);
+        scanStatus.textContent = "No Kindle found. Check Wi-Fi and KOReader SSH server.";
+        showToast("No Kindle detected. Make sure SSH Server is ON.", true);
       }
     } catch (err) {
       scanStatus.textContent = "Scan failed.";
