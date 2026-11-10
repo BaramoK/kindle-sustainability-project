@@ -1,7 +1,7 @@
-# Kindle Paperwhite 2 Revival & Sustainability Guide
-### *Giving 10+ Year Old E-Readers a Second Life & Reducing E-Waste*
+# Kindle Basic 3 (KT4) Revival & Sustainability Guide
+### *Giving Aging E-Readers a Second Life & Reducing E-Waste*
 
-> A complete, field-tested guide to revitalizing the **Kindle Paperwhite 2 (Model EY21)** running final firmware **5.12.2.2** by liberating it from proprietary bloat, installing **KUAL**, and deploying **KOReader** in a lightweight, energy-efficient **No-Framework** mode with wireless macOS Finder transfers.
+> A complete, field-tested guide to revitalizing the **Kindle Basic 3 (2019, 10th generation, codename `KT4`, serial prefix `G09 10L`)** running firmware **`5.18.1.1.1`** by liberating it from proprietary bloat, installing **KUAL**, and deploying **KOReader** in a lightweight, energy-efficient **No-Framework** mode with wireless macOS Finder transfers.
 
 > [!TIP]
 > **🤖 Pair-Programming with a Local CLI AI Agent:**
@@ -11,13 +11,13 @@
 > * **Safely Automate Backups:** Detect volume mounts and perform bit-for-bit local backups automatically (`rsync`).
 > * **Download & Verify Packages:** Fetch the exact firmware-matched exploit files, verify MD5 checksums, and stage directories without manual errors.
 > * **Clean OS Metadata & Manage Drives:** Automatically strip hidden OS artifacts (e.g., macOS `dot_clean`, AppleDouble files) and safely unmount/eject storage.
-> * **Step-by-Step Guidance:** Dynamically troubleshoot in real time (e.g., recognizing gesture timing, handling application popups, configuring wireless SFTP).
+> * **Step-by-Step Guidance:** Dynamically troubleshoot in real time (e.g., recognizing Store timing, handling application popups, configuring wireless SFTP).
 
 ---
 
 ## ✨ What You Get: The Payoff (Why It’s Worth the Effort)
 
-Before embarking on this multi-step process, here is exactly what your Kindle Paperwhite 2 will look like once finished:
+Before embarking on this multi-step process, here is exactly what your Kindle Basic 3 (KT4) will look like once finished:
 
 * ⚡ **Blazing Fast Performance:** RAM consumption drops from **~85% down to under 25%** by suspending Amazon’s heavy Java operating stack (`lab126_gui`). Menus, library navigation, and page turns become instantaneous.
 * 📖 **Universal Format Freedom:** Full native support for **EPUB, PDF, CBZ, CBR, FB2, MOBI, and TXT**. No more converting files through Calibre or Amazon Send-to-Kindle services.
@@ -32,8 +32,8 @@ Before embarking on this multi-step process, here is exactly what your Kindle Pa
 
 Consumer electronics are frequently abandoned not because the hardware has failed, but because modern proprietary software outgrows older hardware constraints.
 
-* **The Hardware Still Shines:** The Kindle Paperwhite 2 features an exceptional 212 PPI Carta e-ink display, durable LED front-lighting, and solid battery life that can easily last for weeks.
-* **The Software Bottleneck:** Out of the box, Amazon's proprietary Java application stack (`lab126_gui`), background telemetry, indexing services, and store integrations consume **75% to 85% of the device's modest RAM** (256 MB / 512 MB) at idle. This causes sluggish UI response, battery drain, and limits you to Amazon-approved document formats.
+* **The Hardware Still Shines:** The Kindle Basic 3 (2019) features a 6" 167 PPI e-ink display, built-in front-lighting, Wi-Fi, and a battery that can easily last for weeks.
+* **The Software Bottleneck:** Out of the box, Amazon's proprietary Java application stack (`lab126_gui`), background telemetry, indexing services, and store integrations consume **75% to 85% of the device's modest 512 MB of RAM** at idle. This causes sluggish UI response, battery drain, and limits you to Amazon-approved document formats.
 * **The Sustainable Solution:** Rather than discarding functional e-readers into landfills, we can remove unwanted background packages, bypass legacy software constraints, and install **KOReader**—a blazing-fast, open-source document viewer. 
 * **The Result:** Memory usage drops from **~85% down to under 25%**, page turns become instantaneous, battery life improves, and the device gains native support for open standards (EPUB, CBZ, PDF) and wireless LAN transfers.
 
@@ -44,8 +44,8 @@ Consumer electronics are frequently abandoned not because the hardware has faile
 > **READ THIS CAREFULLY BEFORE CONTINUING:**
 > 
 > * **Hardware Modification Risks:** While this process is tested and verified, modifying your Kindle's root filesystem and boot scripts carries an inherent risk of soft-bricking or bootlooping the device.
-> * **No Liability:** Neither the authors of this guide nor the open-source developers of WatchThis, KUAL, MRPI, or KOReader assume any responsibility for damaged hardware, lost data, or bricked devices.
-> * **Model Compatibility:** This guide is specifically written and tested for the **Kindle Paperwhite 2 (Model EY21)** on official firmware **`5.12.2.2`**. Do **NOT** follow these exact payloads on different hardware models without consulting the appropriate device trees on MobileRead.
+> * **No Liability:** Neither the authors of this guide nor the open-source developers of SpringBreak, KUAL, MRPI, or KOReader assume any responsibility for damaged hardware, lost data, or bricked devices.
+> * **Model Compatibility:** This guide is specifically written and tested for the **Kindle Basic 3 (2019, codename KT4, serial prefix `G09 10L`)** on firmware **`5.18.1.1.1`**. The exploit used (**SpringBreak**) officially supports **KT4/PW4 on 5.18.1.1.1**. Do **NOT** follow these exact steps on other models/firmware without checking the [KindleModding jailbreak wizard](https://kindlemodding.org/jailbreaking/).
 > * **Mandatory Backup:** Always create a complete, bit-for-bit local backup of your device's flash storage before making any filesystem modifications.
 
 ---
@@ -54,11 +54,11 @@ Consumer electronics are frequently abandoned not because the hardware has faile
 
 | Parameter | Specification |
 | :--- | :--- |
-| **Target Hardware** | Kindle Paperwhite 2 (6th Generation, Model `EY21`, late 2013–2014) |
+| **Target Hardware** | Kindle Basic 3 (2019, 10th Generation, codename `KT4`, serial prefix `G09 10L`) |
 | **Processor** | Freescale/NXP i.MX6 SoloLite (1 GHz ARM Cortex-A9) |
-| **System Memory** | 256 MB or 512 MB (Stock Amazon Java UI idles at ~75–85% utilization) |
-| **Firmware Target** | `5.12.2.2` (Final official software release for PW2) |
-| **Revival Vector** | **WatchThis** (Demo mode package injection method) |
+| **System Memory** | 512 MB (Stock Amazon Java UI idles at ~75–85% utilization) |
+| **Firmware Target** | `5.18.1.1.1` (build `476967 023`) |
+| **Revival Vector** | **SpringBreak** (filler-file + Kindle Store vector) |
 | **Primary Reader** | **KOReader** in **No-Framework** mode (Amazon Java UI suspended) |
 | **E-Waste Impact** | Extends device lifespan indefinitely; adds modern EPUB/PDF reading & Wi-Fi sync |
 
@@ -68,10 +68,10 @@ Consumer electronics are frequently abandoned not because the hardware has faile
 
 Each package serves a distinct, critical purpose in the revival pipeline:
 
-1. **WatchThis Exploit Package (`watchthis-jailbreak-r03.zip`):**
-   * *What it does:* The initial software exploit. Leverages a vulnerability in the Kindle's Demo Mode setup to bypass signature verification and execute custom code on firmware `5.12.2.2`.
-2. **WatchThis Custom Hotfix (`Update_hotfix_watchthis_custom.bin`):**
-   * *What it does:* Included inside the WatchThis archive. It cleanly exits Demo Mode, applies partition patches, and installs custom developer keys into the device keystore so open-root capability survives reboots.
+1. **SpringBreak Exploit (`springbreak.zip`):**
+   * *What it does:* The initial software exploit, released by **Penguins184** (KindleModding). It fills the Kindle with thousands of nested folders, then abuses the Kindle Store / `com.lab126.fts` + `com.lab126.winmgr` path to schedule a `SET.SCFG` ToDo document that runs KindleModding's online `jb.sh` jailbreak script. Officially supports **KT4/PW4 on 5.18.1.1.1**.
+2. **KindleModding `jb.sh` / Jailbreak Hotfix:**
+   * *What it does:* Downloaded and applied automatically by the SpringBreak payload. It installs the jailbreak hotfix, blocks OTA updates, and installs the KPM package manager so open-root capability survives reboots.
 3. **MobileRead Package Installer / MRPI (`kual-mrinstaller-*.tar.xz`):**
    * *What it does:* A specialized command-line package manager for Kindle. Invoked on-device via `;log mrpi` to safely verify, extract, and flash signed `.bin` packages directly into the root partition.
 4. **KUAL Booklet (`KUAL-*-coplate.tar.xz`):**
@@ -97,7 +97,7 @@ Each package serves a distinct, critical purpose in the revival pipeline:
 Once `/Volumes/Kindle` mounts, create an immutable local backup on your computer before touching anything:
 
 ```bash
-BACKUP_DIR="$HOME/Kindle_PW2_Backup_$(date +%Y%m%d_%H%M%S)"
+BACKUP_DIR="$HOME/Kindle_KT4_Backup_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$BACKUP_DIR/user_storage"
 
 # Mirror complete user storage
@@ -125,112 +125,57 @@ mkdir -p /Volumes/Kindle/update.bin.tmp.partial
 
 ---
 
-## Step 3: Factory Reset & Enter Demo Mode
+## Step 3: Jailbreak with SpringBreak
 
-1. **Unplug the USB cable** from the Kindle.
-2. Go to **Settings** (gear or `⋮` menu) → tap `⋮` again → tap **Reset** (or **Reset Device**). Confirm and allow the device to format and restart (1–2 minutes).
-3. **Crucial Language Choice:** On the language setup screen, **you MUST select `English (United Kingdom)` (`en_GB`)**. The exploit structure expects British English system paths.
-4. **Skip Wi-Fi Setup:** When the Wi-Fi list appears, tap any network, then tap **Cancel** to bring up the **Set Up Later** option. Do not connect to Wi-Fi yet.
+> **Why SpringBreak?** On firmware **5.18.1.1.1**, the older Mesquito/WinterBreak vector **does not work** ("Winterbreak/Mesquito does NOT work on firmware 5.18.1 and beyond"). SpringBreak is the method that officially supports **KT4/PW4 on 5.18.1.1.1**.
 
-### ⚠️ Real-World Issue #2: `;enter_demo` Shows No Response
-* **The Symptom:** You tap the search bar, type `;enter_demo`, press Search/Enter, and nothing happens on screen.
-* **The Reality:** This command **provides zero visual feedback or confirmation**. It silently flips an internal system flag.
-* **The Fix:** Immediately after tapping Enter, **hold down the power button for 20–30 seconds** until the screen flashes and restarts. Upon booting, it will automatically launch the Demo Setup Wizard.
+> ⚠️ **Do NOT fill the Kindle beforehand** (unlike WinterBreak). SpringBreak creates thousands of nested folders itself and needs free space. Stay off Wi-Fi until the Store step.
 
----
-
-## Step 4: Demo Setup & Bypassing Demo Lockout
-
-1. In the Demo Wizard:
-   * Skip Wi-Fi setup when prompted.
-   * Enter dummy store information (e.g. `1234`).
-   * Skip searching for a demo payload.
-   * Select the **Standard** demo type.
-   * At the *"sideload content"* prompt, tap **Done**.
-
-### ⚠️ Real-World Issue #3: Blank White Screen After Demo Setup
-* **The Symptom:** The Kindle screen goes completely blank white and appears frozen.
-* **The Fix:** The demo launcher simply failed to trigger an e-ink screen refresh. **Press the physical power button once briefly** (quick click) to sleep/wake the screen and force an e-ink redraw.
-
-### ⚠️ Real-World Issue #4: "Configure Device - Missing Content" Lockout
-* The screen displays: *"This demonstration device is either missing content or is disconnected from the network."*
-
-### ⚠️ Real-World Issue #5: How to Execute the Secret Bypass Gesture
-The bypass gesture is a **two-step timing combo** that requires specific technique on e-ink touchscreens:
-1. **Step 1:** Tap the **bottom-right corner** of the screen with **two fingers simultaneously** (index & middle fingers together), then immediately lift them.
-2. **Step 2:** In quick succession (within 0.5s), **swipe with one finger from right to left** across the bottom half of the screen.
-3. *Rhythm tip:* *"tap-tap (with two fingers) ➔ swipe (with one finger)"*.
-
-Once bypassed, the top search bar will appear!
-
----
-
-## Step 5: Stage the WatchThis Payload
-
-1. In the search bar on your Kindle, type:
-   ```text
-   ;demo
-   ```
-   and tap Enter.
-2. Tap the **Sideload Content** option on screen.
-3. **Plug the Kindle into your Mac via USB.**
-4. From the extracted `watchthis-jailbreak-r03.zip`, copy the exact files for Paperwhite 2 (5.12.2.2):
-   * Create directory `/Volumes/Kindle/.demo`
-   * Copy `PW2-5.12.2.2.zip` directly into `/Volumes/Kindle/.demo/` (**DO NOT EXTRACT IT**)
-   * Copy `demo.json` directly into `/Volumes/Kindle/.demo/`
-   * Create an empty directory `/Volumes/Kindle/.demo/goodreads`
-5. Eject cleanly:
+1. **Unplug the Kindle**, put it in **Airplane Mode**, then **reboot** it (hold the power button → *Restart*).
+2. **Re-plug** the Kindle into your computer. For the tool to detect it, the volume must be **mounted**:
+   * **macOS:** it mounts automatically at `/Volumes/Kindle`.
+   * **Linux:** open it once in your file manager, or run `udisksctl mount -b /dev/sdX1` (it then appears under `/run/media/<user>/Kindle`).
+   * The Kindle screen must show the plain "USB drive" screen — **not** a "disconnect" button. If it shows the latter, the device/firmware is not supported.
+3. **Download and unzip SpringBreak** on your computer:
    ```bash
-   dot_clean /Volumes/Kindle
-   diskutil eject /Volumes/Kindle
+   curl -L https://github.com/KindleModding/SpringBreak/releases/latest/download/springbreak.zip -o springbreak.zip
+   python3 -m zipfile -e springbreak.zip springbreak/   # or use 7-Zip / unzip
    ```
+4. **Run the binary** matching your OS and select your Kindle from the list:
+   * **Linux:** `chmod +x ./springbreak-linux && ./springbreak-linux`
+   * **Windows:** double-click `springbreak.exe`
+   * **macOS:** `chmod +x ./springbreak-darwin && ./springbreak-darwin`
+5. The tool fills the Kindle with nested filler folders. **This takes a while** (considerably longer on Windows than on Linux).
+6. **Unplug** the Kindle. On the home screen, tap the **Store (shopping cart)** icon. When prompted, **turn off Airplane Mode** (Wi-Fi **is** required). You can turn Wi-Fi back off as soon as SpringBreak has loaded.
+7. SpringBreak loads inside the Store and text streams down the screen. After a few seconds the **success screen** appears and the Kindle reboots into an **open-root (jailbroken) state**.
+
+### ⚠️ Real-World Issue #2: Opening the Store Shows "Application Error"
+* **The Symptom:** After unplugging, tapping the Store icon throws an *"Application Error"*.
+* **The Fix:** Unplug and re-plug the Kindle once or twice until the Store loads correctly, then tap the Store icon again.
+
+### ⚠️ Real-World Issue #3: The Kindle Is Not Listed by SpringBreak
+* **The Cause:** The Kindle volume is not mounted, or a charge-only cable is in use.
+* **The Fix:** Use a data cable and make sure the volume is mounted (Linux: open it in your file manager first; macOS: verify `/Volumes/Kindle` exists).
+
+### ⚠️ Real-World Issue #4: Filling Fails Due to Lack of Space
+* **The Cause:** Not enough free space for the nested filler folders.
+* **The Fix:** Delete some existing content, re-run the script once to remove any partial fillers, then retry.
 
 ---
 
-## Step 6: Trigger the Liberation Exploit
+## Step 4: Clean Up After SpringBreak
 
-1. Tap **Done** at the "sideload content" prompt on the Kindle screen.
+**This step is mandatory** — skipping it makes the Kindle take **15+ minutes** to boot because the filler folders are still present.
 
-### ⚠️ Real-World Issue #6: "Application Error" When Exiting Demo Mode
-* **The Symptom:** Tapping Exit pops up an alert: *"Application error: Please try again"* with only a "Close" button.
-* **The Fix:**
-  * Tap **Close**.
-  * Check the top navigation bar: if the **Store (shopping cart) icon** is visible, proceed directly!
-  * If frozen, perform a hard reboot (hold power button for 15s), re-open `;demo` → **Sideload Content** → tap **Done** (files are already safely on the device).
-2. **Paperwhite 2 Trigger:** Tap the **Store icon (shopping cart)** at the top of the screen.
-3. Select **Help & User Guides** → tap **Get Started**.
-4. The device will flash, display the exploit overlay on screen, and reboot into an open-root state!
+1. Wait until the Kindle has rebooted back to the **home screen** and the UI has settled.
+2. **Plug the Kindle back in**, run the **same binary** again, select the Kindle, and let it **clean up** (it removes the filler folders).
+3. Unplug cleanly.
+4. Remove any leftover update files with a **`.bin`** extension from the Kindle root, if present.
+5. **Verify:** the device boots in a normal amount of time and the jailbreak is active (OTA updates are now blocked automatically).
 
 ---
 
-## Step 7: Install WatchThis Custom Hotfix
-
-The Kindle will reboot back into Demo Mode. To permanently exit demo mode and preserve root access:
-
-1. Perform the bypass gesture (two-finger tap bottom right, swipe left).
-2. In the search bar, type:
-   ```text
-   ;uzb
-   ```
-   and tap Enter (forces USB mass storage mode).
-3. Connect the Kindle to your Mac.
-4. Copy `Update_hotfix_watchthis_custom.bin` to the root of `/Volumes/Kindle/`.
-5. Eject and unplug cleanly:
-   ```bash
-   dot_clean /Volumes/Kindle
-   diskutil eject /Volumes/Kindle
-   ```
-6. In the search bar on the Kindle, type:
-   ```text
-   ;dsts
-   ```
-   and tap Enter (opens Device Settings).
-7. Tap **Update Your Kindle** (now clickable).
-8. The Kindle will install the hotfix, exit demo mode permanently, and reboot to the clean, stock home screen with root keys installed.
-
----
-
-## Step 8: Deploy KUAL, Root Hotfix & KOReader via MRPI
+## Step 5: Deploy KUAL, Root Hotfix & KOReader via MRPI
 
 1. Connect the Kindle to your Mac via USB.
 2. Extract the utility packages onto `/Volumes/Kindle/`:
@@ -253,20 +198,20 @@ The Kindle will reboot back into Demo Mode. To permanently exit demo mode and pr
 
 ---
 
-## Step 9: Running KOReader in "No-Framework" Mode
+## Step 6: Running KOReader in "No-Framework" Mode
 
 1. Open **KUAL** from your library.
 2. Tap **KOReader** → select **"Start KOReader (no framework)"**.
 3. The screen will briefly flash black as the Amazon GUI shuts down.
 
-### ⚠️ Real-World Issue #7: Why Exiting KOReader Restarts the Kindle
+### ⚠️ Real-World Issue #5: Why Exiting KOReader Restarts the Kindle
 * **The Symptom:** When you tap Exit inside KOReader, the screen flashes and the Kindle reboots / reloads the interface.
 * **The Reason:** In "No-Framework" mode, KOReader executes `stop lab126_gui` on launch, shutting down Amazon's bloated Java system to free up **~70% of the device's RAM** (dropping memory usage from ~85% to under 25%).
 * When you exit KOReader, the wrapper script executes `start lab126_gui`, which prompts Upstart to reload the Amazon environment. This warm restart is completely normal and intentional.
 
 ---
 
-## Step 10: Wireless EPUB Transfer via macOS Finder (Zero Cables!)
+## Step 7: Wireless EPUB Transfer via macOS Finder (Zero Cables!)
 
 Once inside KOReader, you never need to connect a physical micro-USB cable again:
 
@@ -314,10 +259,10 @@ Included in this repository is **Kindle Drop**, a lightweight, responsive web ap
 | Issue | Cause | Solution |
 | :--- | :--- | :--- |
 | **Not detected in Finder** | Charge-only cable or macOS USB permission | Use a data micro-USB cable; allow accessory on macOS Apple Silicon. |
-| **`;enter_demo` does nothing** | Silent flag; provides no popup | Hold power button for 25s immediately to reboot into Demo Wizard. |
-| **Blank white screen** | E-ink screen refresh lag | Click power button once briefly to sleep/wake and redraw screen. |
-| **Demo lockout screen** | Demo mode missing content | Perform secret gesture: 2-finger tap bottom-right ➔ swipe left. |
-| **"Application error" on exit** | Demo framework glitch | Tap Close and look for Store icon; or hard reboot (15s) and re-open `;demo`. |
+| **SpringBreak does not list my Kindle** | Volume not mounted, or charge-only cable | Mount the volume (Linux: open it in your file manager) and use a data USB cable. |
+| **Store shows "Application Error"** | Store cache glitch after unplug | Unplug and re-plug the Kindle once or twice, then reopen the Store. |
+| **Kindle takes 15+ min to boot** | Filler folders not cleaned up | Re-run the SpringBreak binary and let it perform clean-up (Step 4). |
+| **SpringBreak filling fails** | Not enough free space | Free up space, re-run once to clear partial fillers, then retry. |
 | **Kindle restarts on KOReader exit** | Normal "No-Framework" behavior | Expected: restarting Amazon Java GUI (`lab126_gui`) after exit. |
 | **USB mode not popping up in KOReader** | Amazon daemons suspended | Expected in No-Framework mode: use Kindle Drop / Wi-Fi SFTP, or exit KOReader. |
 | **KOReader crashes back to home menu** | FAT32 corruption (`FSCK0000.REN` files) | Caused by pulling cable or dead battery. Reinstall clean KOReader files while preserving `settings/`. |
@@ -327,7 +272,8 @@ Included in this repository is **Kindle Drop**, a lightweight, responsive web ap
 
 ## License & Credits
 
-* **WatchThis Exploit:** Created by **katadelos** (MobileRead)
+* **SpringBreak Exploit:** Created by **Penguins184** (KindleModding) — [write-up](https://penguins184.xyz/blog/springbreak-jailbreak/)
+* **Initial LPE & core ideas:** **Hhhhhhhhh**; filler-file vector credited to **Hackerdude**
 * **MobileRead Package Installer & Hotfix:** Maintained by **NiLuJe** (MobileRead)
 * **KUAL:** Developed by **twobob**, **StepK**, **coplate**, **NiLuJe**
 * **KOReader:** The open-source KOReader development team ([koreader.rocks](https://koreader.rocks))

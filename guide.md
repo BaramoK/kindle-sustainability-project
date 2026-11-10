@@ -1,23 +1,23 @@
-# Kindle Paperwhite 2 (6th Gen) Automation & Jailbreak Manual
+# Kindle Basic 3 (10th Gen / KT4) Automation & Jailbreak Manual
 
-This specification is designed for an autonomous local agent running on macOS to stage packages, execute exploits safely, perform system backups, and deploy an unbloated KOReader environment.
+This specification is designed for an autonomous local agent (macOS or Linux) to stage packages, execute the **SpringBreak** exploit safely, perform system backups, and deploy an unbloated KOReader environment on a **Kindle Basic 3 (2019)** running firmware **`5.18.1.1.1`**.
 
 ---
 
 ## Technical Specifications & Architecture Overview
 
-* **Target Hardware:** Kindle Paperwhite 2 (Model `EY21`, late 2013–2014)
+* **Target Hardware:** Kindle Basic 3 (2019) — 10th generation — codename **`KT4`** (serial prefix `G09 10L`)
 * **Processor:** Freescale/NXP i.MX6 SoloLite (1 GHz Cortex-A9)
-* **RAM:** 256 MB or 512 MB (tight memory constraints; stock Java stack utilizes ~70–85%)
-* **Assumed Target Firmware:** `5.12.2.2` (the final official release for PW2)
-* **Exploit Vector:** **WatchThis** software exploit (via demo mode packaging)
+* **RAM:** 512 MB (tight memory constraints; stock Java stack utilizes ~70–85%)
+* **Assumed Target Firmware:** `5.18.1.1.1` (build `476967 023`)
+* **Exploit Vector:** **SpringBreak** software exploit (filler-file + Kindle Store vector)
 * **Primary Target:** KOReader in **No-Framework mode** (Amazon Java UI suspended)
 
 ---
 
 ## Agent Operational Constraints
 
-1. **Volume Mount:** Kindle mass storage mounts at `/Volumes/Kindle` on macOS.
+1. **Volume Mount:** Kindle mass storage mounts at `/Volumes/Kindle` on macOS, or `/run/media/<user>/Kindle` on Linux (mount it first with the file manager or `udisksctl mount -b /dev/sdX1`).
 2. **Read-Only / Human Boundary:** The agent cannot tap the physical e-ink screen. When on-device input is required, the agent must pause, output clear on-screen instructions, and await human confirmation before proceeding.
 3. **Fail-Safe Checkpoints:** If the mount point is absent, or if directory contents are corrupted, halt immediately.
 
@@ -31,8 +31,9 @@ The agent must verify volume availability and take a bit-for-bit or file-level b
 Create a local backup directory on macOS and sync the complete Kindle drive:
 
 ```bash
-BACKUP_DIR="$HOME/Kindle_PW2_Backup_$(date +%Y%m%d_%H%M%S)"
+BACKUP_DIR="$HOME/Kindle_KT4_Backup_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$BACKUP_DIR"
+# macOS: /Volumes/Kindle   |   Linux: /run/media/<user>/Kindle
 rsync -aHAX --progress /Volumes/Kindle/ "$BACKUP_DIR/user_storage/"
 
 ```
@@ -55,45 +56,45 @@ chmod 000 /Volumes/Kindle/update.bin.tmp.partial
 2. **Verification:** Test that the file cannot be written to or replaced by running `touch /Volumes/Kindle/update.bin.tmp.partial/test` and confirming it returns `Permission denied`.
 
 
-3. **Stage the WatchThis Exploit Packages:** 5 min.
-Fetch and place the exploit payload onto the device storage.
+3. **Download and Stage the SpringBreak Exploit:** 5 min.
+SpringBreak fills the Kindle with thousands of nested folders so its Store cache cannot be evicted when the USB cable is pulled.
 
-1. Obtain the official **WatchThis** distribution archive (from the MobileRead Kindle Developer's Corner).
-2. Create the hidden demo staging directory on the Kindle:
-
-```bash
-mkdir -p /Volumes/Kindle/.demo
-
-```
-
-3. Copy the exploit payload files into `/Volumes/Kindle/` and `/Volumes/Kindle/.demo/` exactly as specified in the WatchThis distribution tree.
-4. Run macOS cleanup to remove stray AppleDouble files:
+1. Download the latest **SpringBreak** release from the KindleModding organisation:
 
 ```bash
-dot_clean /Volumes/Kindle
-diskutil eject /Volumes/Kindle
+curl -L https://github.com/KindleModding/SpringBreak/releases/latest/download/springbreak.zip -o springbreak.zip
+python3 -m zipfile -e springbreak.zip springbreak/   # or use 7-Zip / unzip
 
 ```
 
-5. **Verification:** `diskutil list` confirms `/Volumes/Kindle` is cleanly unmounted.
+The archive contains `springbreak-linux`, `springbreak.exe`, `springbreak-darwin`, and the hidden `.active_content_sandbox/` folder.
+
+2. **Do NOT fill the Kindle beforehand.** Unlike WinterBreak, SpringBreak needs free space: it creates thousands of nested folders itself. Leave plenty of room and stay off Wi-Fi until the Store step.
+3. **Do NOT extract anything onto the Kindle by hand.** The binary below performs the whole staging; the payload lives on your computer.
+
+> ⚠️ **Linux note:** the Kindle must be *mounted* for the tool to see it. Open it once in your file manager (e.g. GNOME Files) or run `udisksctl mount -b /dev/sdX1` so it appears under `/run/media/<user>/Kindle`.
 
 
-4. **Execute On-Device Jailbreak (Human Action Required):** 5 min.
-The agent halts here and prompts the human user to trigger the on-device sequence.
+4. **Run the SpringBreak Binary and Execute the Exploit (Human Action Required):** 15-30 min.
+The agent runs the tool; the human handles the on-device steps.
 
-1. Unplug the USB cable from the Kindle.
-2. Put the device in **Airplane Mode** via the Quick Actions / Settings menu.
-3. Open the search bar on the Kindle home screen, type:
+1. Put the Kindle in **Airplane Mode**, then **reboot** it and plug it into the computer via USB.
+2. On the computer, run the binary matching your OS and select your Kindle from the list:
 
-```text
-;enter_demo
+```bash
+# Linux
+chmod +x ./springbreak-linux && ./springbreak-linux
+# macOS
+chmod +x ./springbreak-darwin && ./springbreak-darwin
+# Windows: double-click springbreak.exe
 
 ```
 
-and tap Enter.
-4. Reboot the device when prompted or via the power button.
-5. In Demo mode, tap through the initial setup prompt, complete the bypass gesture (double-tap with two fingers or the specific WatchThis trigger pattern), and open the staged demo document.
-6. The exploit executes, displays the jailbreak text overlay, and reboots the Kindle into an open-root state.
+3. The tool fills the device with nested filler folders — this is considerably slower on Windows than on Linux.
+4. **Unplug** the Kindle, go to the home screen and tap the **Store (shopping cart)** icon. When prompted, **turn off Airplane Mode** (Wi-Fi is required). You may turn Wi-Fi off again immediately afterwards.
+5. SpringBreak loads inside the Store; text streams down the screen. After a few seconds the success screen appears and the Kindle reboots into an open-root (jailbroken) state.
+
+> ⚠️ **Clean-up is mandatory:** once back on the home screen, plug the Kindle in again, re-run the same binary, select the device and let it clean up. Skipping this makes the Kindle take 15+ minutes to boot.
 
 
 5. **Stage MRPI, Hotfix, KUAL, and KOReader:** 5 min.
